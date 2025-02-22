@@ -1,0 +1,80 @@
+body {
+  font-family: "Poppins", sans-serif;
+  transition: background 0.3s, color 0.3s;
+}
+body.dark-mode {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+.generator {
+  padding: 6rem 2rem 4rem;
+  background: linear-gradient(to bottom, #f3f4f6, #e5e7eb);
+  min-height: 100vh;
+}
+.generator h1 {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.generator > p {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.generator-section, .editor-section {
+  margin: 2rem auto;
+  max-width: 800px;
+}
+.generator-section h2, .editor-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+.generator-section form {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 1rem 0;
+}
+.generator-section input {
+  padding: 0.75rem;
+  width: 60%;
+  border: 2px solid #4f46e5;
+  border-radius: 5px;
+}
+.generator-section button {
+  padding: 0.75rem 1.5rem;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.generator-section button:hover {
+  background: #6366f1;
+}
+.editor-content {
+  text-align: center;
+}
+#editor-img {
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
+  border: 2px solid #4f46e5;
+  border-radius: 5px;
+}
+.editor-tools {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 1rem 0;
+}
+.editor-tools button, #save-edit {
+  padding: 0.75rem 1.5rem;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.editor-tools button:hover, #save-edit:hover {
+  background: #6366f1;
+}
