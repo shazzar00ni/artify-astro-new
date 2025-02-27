@@ -1,0 +1,417 @@
+---
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Create and customize unique artwork with Artify-AI's generator and editor tools." />
+    <title>Artify-AI: AI Artwork Generator & Editor</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <section id="generator" class="generator">
+        <div class="container">
+          <h1>Generate & Edit AI Artwork</h1>
+          <p class="subtitle">Create and customize unique art with advanced AI technology.</p>
+          
+          <!-- Generator Section -->
+          <div class="generator-section">
+            <h2>Generate Artwork</h2>
+            <form id="generator-form">
+              <div class="form-group">
+                <label for="prompt-input">Enter a description</label>
+                <input 
+                  id="prompt-input" 
+                  type="text" 
+                  placeholder="e.g., A futuristic city at sunset with flying cars" 
+                  required 
+                  aria-describedby="prompt-help"
+                />
+                <small id="prompt-help" class="form-text">Be specific for better results</small>
+              </div>
+              <div class="form-group">
+                <label for="style-select">Art Style</label>
+                <select id="style-select">
+                  <option value="realistic">Realistic</option>
+                  <option value="abstract">Abstract</option>
+                  <option value="digital">Digital Art</option>
+                  <option value="watercolor">Watercolor</option>
+                  <option value="anime">Anime</option>
+                </select>
+              </div>
+              <button type="submit" class="primary-button">
+                <span id="generate-text">Generate</span>
+                <span id="loading-spinner" class="spinner hidden"></span>
+              </button>
+            </form>
+            
+            <div id="generation-status" class="status-message" aria-live="polite"></div>
+            <div id="generated-images" class="artwork-grid" aria-label="Generated artwork gallery"></div>
+          </div>
+
+          <!-- Editor Section -->
+          <div class="editor-section">
+            <h2>Edit Artwork</h2>
+            <div class="editor-content">
+              <div class="editor-workspace">
+                <div class="editor-canvas-container">
+                  <img id="editor-img" src="/placeholder-artwork.jpg" alt="Selected image for editing" />
+                </div>
+                <div class="editor-tools">
+                  <div class="tool-group">
+                    <h3>Adjustments</h3>
+                    <div class="slider-control">
+                      <label for="brightness">Brightness</label>
+                      <input type="range" id="brightness" min="0" max="200" value="100" />
+                      <button id="reset-brightness" class="reset-button" aria-label="Reset brightness">↺</button>
+                    </div>
+                    <div class="slider-control">
+                      <label for="contrast">Contrast</label>
+                      <input type="range" id="contrast" min="0" max="200" value="100" />
+                      <button id="reset-contrast" class="reset-button" aria-label="Reset contrast">↺</button>
+                    </div>
+                    <div class="slider-control">
+                      <label for="saturation">Saturation</label>
+                      <input type="range" id="saturation" min="0" max="200" value="100" />
+                      <button id="reset-saturation" class="reset-button" aria-label="Reset saturation">↺</button>
+                    </div>
+                  </div>
+                  
+                  <div class="tool-group">
+                    <h3>Effects</h3>
+                    <button id="grayscale" class="effect-button">Grayscale</button>
+                    <button id="sepia" class="effect-button">Sepia</button>
+                    <button id="invert" class="effect-button">Invert</button>
+                    <button id="blur" class="effect-button">Blur</button>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="editor-actions">
+                <div class="upload-container">
+                  <label for="upload-img" class="upload-label">Upload Image</label>
+                  <input type="file" id="upload-img" accept="image/*" class="file-input" />
+                </div>
+                <button id="reset-all" class="secondary-button">Reset All</button>
+                <button id="save-edit" class="primary-button">Save Image</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <Footer />
+
+    <script>
+      // Constants and cached DOM elements
+      const form = document.getElementById("generator-form");
+      const promptInput = document.getElementById("prompt-input");
+      const styleSelect = document.getElementById("style-select");
+      const generateButton = form.querySelector("button[type=submit]");
+      const generateText = document.getElementById("generate-text");
+      const loadingSpinner = document.getElementById("loading-spinner");
+      const statusMessage = document.getElementById("generation-status");
+      const gallery = document.getElementById("generated-images");
+      const editorImg = document.getElementById("editor-img");
+      
+      // Store original filter values
+      let filters = {
+        brightness: 100,
+        contrast: 100,
+        saturation: 100,
+        grayscale: 0,
+        sepia: 0,
+        invert: 0,
+        blur: 0
+      };
+      
+      // Generate images
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const prompt = promptInput.value.trim();
+        const style = styleSelect.value;
+        
+        if (!prompt) return;
+        
+        // Show loading state
+        generateText.classList.add("hidden");
+        loadingSpinner.classList.remove("hidden");
+        generateButton.disabled = true;
+        statusMessage.textContent = "Generating your artwork...";
+        statusMessage.classList.remove("hidden", "error");
+        
+        try {
+          // Simulate API call with timeout (replace with actual API call)
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          
+          // Create unique placeholder URL based on prompt and style
+          const hash = Math.floor(Math.random() * 1000);
+          const imageUrl = `https://via.placeholder.com/500x350/f5f5f5/333333?text=${encodeURIComponent(style + ": " + prompt.substring(0, 20))}`;
+          
+          // Create artwork element
+          const imgDiv = document.createElement("div");
+          imgDiv.className = "artwork";
+          imgDiv.innerHTML = `
+            <div class="artwork-container">
+              <img src="${imageUrl}" alt="${prompt}" loading="lazy" />
+              <div class="artwork-overlay">
+                <button class="edit-button" aria-label="Edit this image">Edit</button>
+              </div>
+            </div>
+            <p class="artwork-prompt">${prompt}</p>
+            <p class="artwork-style">${style}</p>
+          `;
+          
+          // Add click event to edit button
+          imgDiv.querySelector(".edit-button").addEventListener("click", () => {
+            editorImg.src = imageUrl;
+            editorImg.alt = prompt;
+            resetAllFilters(); // Reset filters when selecting new image
+            editorImg.scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+          
+          // Add to gallery (prepend to show newest first)
+          gallery.prepend(imgDiv);
+          form.reset();
+          statusMessage.textContent = "Artwork generated successfully!";
+          setTimeout(() => statusMessage.classList.add("fade-out"), 3000);
+        } catch (error) {
+          console.error("Error generating image:", error);
+          statusMessage.textContent = "Error generating image. Please try again.";
+          statusMessage.classList.add("error");
+        } finally {
+          // Reset button state
+          generateText.classList.remove("hidden");
+          loadingSpinner.classList.add("hidden");
+          generateButton.disabled = false;
+        }
+      });
+
+      // Image Editor Logic
+      const brightnessSlider = document.getElementById("brightness");
+      const contrastSlider = document.getElementById("contrast");
+      const saturationSlider = document.getElementById("saturation");
+      const grayscaleBtn = document.getElementById("grayscale");
+      const sepiaBtn = document.getElementById("sepia");
+      const invertBtn = document.getElementById("invert");
+      const blurBtn = document.getElementById("blur");
+      const resetAllBtn = document.getElementById("reset-all");
+      const uploadInput = document.getElementById("upload-img");
+      const saveBtn = document.getElementById("save-edit");
+      
+      // Apply all filters
+      function applyFilters() {
+        editorImg.style.filter = `
+          brightness(${filters.brightness}%) 
+          contrast(${filters.contrast}%) 
+          saturate(${filters.saturation}%) 
+          grayscale(${filters.grayscale}%) 
+          sepia(${filters.sepia}%) 
+          invert(${filters.invert}%) 
+          blur(${filters.blur}px)
+        `;
+      }
+      
+      // Reset all filters
+      function resetAllFilters() {
+        filters = {
+          brightness: 100,
+          contrast: 100,
+          saturation: 100,
+          grayscale: 0,
+          sepia: 0,
+          invert: 0,
+          blur: 0
+        };
+        
+        // Reset slider values
+        brightnessSlider.value = 100;
+        contrastSlider.value = 100;
+        saturationSlider.value = 100;
+        
+        // Reset effect button states
+        document.querySelectorAll('.effect-button').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        applyFilters();
+      }
+      
+      // Slider Events
+      brightnessSlider.addEventListener("input", () => {
+        filters.brightness = brightnessSlider.value;
+        applyFilters();
+      });
+      
+      contrastSlider.addEventListener("input", () => {
+        filters.contrast = contrastSlider.value;
+        applyFilters();
+      });
+      
+      saturationSlider.addEventListener("input", () => {
+        filters.saturation = saturationSlider.value;
+        applyFilters();
+      });
+      
+      // Reset individual adjustments
+      document.getElementById("reset-brightness").addEventListener("click", () => {
+        brightnessSlider.value = 100;
+        filters.brightness = 100;
+        applyFilters();
+      });
+      
+      document.getElementById("reset-contrast").addEventListener("click", () => {
+        contrastSlider.value = 100;
+        filters.contrast = 100;
+        applyFilters();
+      });
+      
+      document.getElementById("reset-saturation").addEventListener("click", () => {
+        saturationSlider.value = 100;
+        filters.saturation = 100;
+        applyFilters();
+      });
+      
+      // Effect toggle buttons
+      grayscaleBtn.addEventListener("click", () => {
+        grayscaleBtn.classList.toggle("active");
+        filters.grayscale = grayscaleBtn.classList.contains("active") ? 100 : 0;
+        applyFilters();
+      });
+      
+      sepiaBtn.addEventListener("click", () => {
+        sepiaBtn.classList.toggle("active");
+        filters.sepia = sepiaBtn.classList.contains("active") ? 100 : 0;
+        applyFilters();
+      });
+      
+      invertBtn.addEventListener("click", () => {
+        invertBtn.classList.toggle("active");
+        filters.invert = invertBtn.classList.contains("active") ? 100 : 0;
+        applyFilters();
+      });
+      
+      blurBtn.addEventListener("click", () => {
+        blurBtn.classList.toggle("active");
+        filters.blur = blurBtn.classList.contains("active") ? 5 : 0;
+        applyFilters();
+      });
+      
+      // Reset all filters
+      resetAllBtn.addEventListener("click", resetAllFilters);
+      
+      // Upload image
+      uploadInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          // Security check for file type
+          if (!file.type.match('image.*')) {
+            alert('Please select an image file (JPEG, PNG, etc.)');
+            return;
+          }
+          
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            editorImg.src = event.target.result;
+            resetAllFilters();
+            
+            // Add metadata for user-uploaded image
+            editorImg.setAttribute('data-source', 'user-upload');
+            editorImg.setAttribute('data-filename', file.name);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+      
+      // Save edited image
+      saveBtn.addEventListener("click", () => {
+        try {
+          // Create canvas to apply filters for download
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          
+          // Wait for image to load
+          if (!editorImg.complete) {
+            alert("Please wait for the image to load completely before saving.");
+            return;
+          }
+          
+          // Set canvas dimensions to match image
+          canvas.width = editorImg.naturalWidth;
+          canvas.height = editorImg.naturalHeight;
+          
+          // Apply filters to canvas context if possible
+          if (filters.grayscale > 0) ctx.filter += `grayscale(${filters.grayscale}%) `;
+          if (filters.brightness !== 100) ctx.filter += `brightness(${filters.brightness}%) `;
+          if (filters.contrast !== 100) ctx.filter += `contrast(${filters.contrast}%) `;
+          if (filters.saturation !== 100) ctx.filter += `saturate(${filters.saturation}%) `;
+          if (filters.sepia > 0) ctx.filter += `sepia(${filters.sepia}%) `;
+          if (filters.invert > 0) ctx.filter += `invert(${filters.invert}%) `;
+          if (filters.blur > 0) ctx.filter += `blur(${filters.blur}px) `;
+          
+          // Draw image to canvas
+          ctx.drawImage(editorImg, 0, 0);
+          
+          // Create download link
+          const link = document.createElement("a");
+          
+          // Get filename from original or create new one
+          const filename = editorImg.getAttribute('data-filename') || 'artify-ai-edited-image.png';
+          
+          // Convert canvas to data URL
+          link.href = canvas.toDataURL("image/png");
+          link.download = filename;
+          link.click();
+          
+          // Provide user feedback
+          const feedbackMsg = document.createElement("div");
+          feedbackMsg.className = "save-feedback";
+          feedbackMsg.textContent = "Image saved successfully!";
+          document.querySelector(".editor-actions").appendChild(feedbackMsg);
+          
+          // Remove feedback after delay
+          setTimeout(() => feedbackMsg.remove(), 3000);
+        } catch (error) {
+          console.error("Error saving image:", error);
+          alert("There was an error saving your image. Please try again.");
+        }
+      });
+
+      // Theme Toggle in Header
+      const toggle = document.getElementById("theme-toggle");
+      if (toggle) {
+        toggle.addEventListener("click", () => {
+          document.body.classList.toggle("dark-mode");
+          localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+        });
+        
+        // Apply saved theme on load
+        if (localStorage.getItem("theme") === "dark") {
+          document.body.classList.add("dark-mode");
+        }
+      }
+      
+      // Initialize page
+      resetAllFilters();
+      
+      // Accessibility: Make sure upload button is keyboard accessible
+      const uploadLabel = document.querySelector(".upload-label");
+      if (uploadLabel) {
+        uploadLabel.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            uploadInput.click();
+          }
+        });
+        uploadLabel.setAttribute("tabindex", "0");
+      }
+    </script>
+  </body>
+</html>

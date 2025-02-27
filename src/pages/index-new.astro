@@ -1,0 +1,121 @@
+---
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Hero from "../components/Hero.astro";
+import Features from "../components/Features.astro";
+import Community from "../components/Community.astro";
+import Profile from "../components/Profile.astro";
+import Newsletter from "../components/Newsletter.astro";
+import Footer from "../components/Footer.astro";
+
+const heroData = {
+  title: "Artify-AI: Innovate. Create. Inspire.",
+  subtitle: "Experience the power of AI with Artify-AI.",
+};
+
+// SEO metadata
+const pageTitle = "Artify-AI: Innovate. Create. Inspire.";
+const pageDescription = "Experience the cutting-edge AI tools and services from Artify-AI.";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={pageDescription} />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <title>{pageTitle}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <Hero title={heroData.title} subtitle={heroData.subtitle} />
+      <Features />
+      <Community />
+      <Profile />
+      <Newsletter />
+    </main>
+    <Footer />
+
+    <script>
+      // Theme toggle functionality
+      document.addEventListener('DOMContentLoaded', () => {
+        const toggle = document.getElementById("theme-toggle");
+        const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+        
+        // Apply stored theme preference or default to user's system preference
+        const storedTheme = localStorage.getItem("theme");
+        if (storedTheme === "dark" || (!storedTheme && prefersDarkScheme.matches)) {
+          document.body.classList.add("dark-mode");
+        }
+        
+        // Theme toggle click handler
+        toggle?.addEventListener("click", () => {
+          document.body.classList.toggle("dark-mode");
+          const currentTheme = document.body.classList.contains("dark-mode") ? "dark" : "light";
+          localStorage.setItem("theme", currentTheme);
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll("nav a[href^='#']").forEach(anchor => {
+          anchor.addEventListener("click", (e) => {
+            e.preventDefault();
+            const href = anchor.getAttribute("href");
+            if (href) {
+              const targetElement = document.querySelector(href);
+              if (targetElement) {
+                targetElement.scrollIntoView({ behavior: "smooth" });
+              }
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
+
+<style>
+  :root {
+    --bg-light: #ffffff;
+    --text-light: #333333;
+    --bg-dark: #1f2937;
+    --text-dark: #e5e7eb;
+  }
+
+  body {
+    font-family: "Poppins", sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-light);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+  }
+
+  body.dark-mode {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+  }
+
+  main {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body {
+      transition: none;
+    }
+  }
+</style>

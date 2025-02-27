@@ -1,0 +1,562 @@
+---
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Artify-AI: Generator & Editor</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <section id="generator" class="generator">
+        <h1>Generate & Edit AI Artwork</h1>
+        <p>Create and customize unique art with advanced AI technology.</p>
+        
+        <!-- User Account Status -->
+        <div class="user-status">
+          <button id="login-btn" class="auth-btn"><i class="fas fa-user"></i> Login</button>
+          <button id="signup-btn" class="auth-btn"><i class="fas fa-user-plus"></i> Sign Up</button>
+          <div id="user-profile" class="hidden">
+            <img src="https://via.placeholder.com/40" alt="Profile" class="profile-img" />
+            <span id="username">User</span>
+          </div>
+
+    <script>
+      // Theme Toggle
+      const toggle = document.getElementById("theme-toggle");
+      toggle?.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+        localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+      });
+      
+      if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark-mode");
+
+      // Modal Functionality
+      const loginBtn = document.getElementById("login-btn");
+      const signupBtn = document.getElementById("signup-btn");
+      const upgradeBtn = document.getElementById("upgrade-btn");
+      const loginModal = document.getElementById("login-modal");
+      const signupModal = document.getElementById("signup-modal");
+      const upgradeModal = document.getElementById("upgrade-modal");
+      const closeButtons = document.querySelectorAll(".close-modal");
+      const showSignupLink = document.getElementById("show-signup");
+
+      loginBtn?.addEventListener("click", () => {
+        loginModal.classList.remove("hidden");
+      });
+
+      signupBtn?.addEventListener("click", () => {
+        signupModal.classList.remove("hidden");
+      });
+
+      upgradeBtn?.addEventListener("click", () => {
+        upgradeModal.classList.remove("hidden");
+      });
+
+      showSignupLink?.addEventListener("click", (e) => {
+        e.preventDefault();
+        loginModal.classList.add("hidden");
+        signupModal.classList.remove("hidden");
+      });
+
+      closeButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          loginModal.classList.add("hidden");
+          signupModal.classList.add("hidden");
+          upgradeModal.classList.add("hidden");
+        });
+      });
+
+      window.addEventListener("click", (e) => {
+        if (e.target === loginModal || e.target === signupModal || e.target === upgradeModal) {
+          loginModal.classList.add("hidden");
+          signupModal.classList.add("hidden");
+          upgradeModal.classList.add("hidden");
+        }
+      });
+
+      // Enhanced Generator Logic
+      const form = document.getElementById("generator-form");
+      const gallery = document.getElementById("generated-images");
+      const progress = document.getElementById("generation-progress");
+      const progressBar = progress?.querySelector(".progress-bar");
+      const progressStatus = progress?.querySelector(".progress-status");
+      const sharePanel = document.getElementById("share-panel");
+      const editorImg = document.getElementById("editor-img");
+      const promptInput = document.getElementById("prompt-input");
+      const promptSuggestions = document.querySelectorAll(".suggestion");
+      const remainingGenerations = document.getElementById("remaining-generations");
+
+      // Set initial count
+      let generationsLeft = 10;
+      remainingGenerations.textContent = generationsLeft;
+
+      // Prompt suggestions
+      promptSuggestions.forEach(suggestion => {
+        suggestion.addEventListener("click", () => {
+          promptInput.value = suggestion.textContent;
+        });
+      });
+
+      form?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const prompt = promptInput.value;
+        const model = document.getElementById("generation-model").value;
+        const aspectRatio = document.getElementById("aspect-ratio").value;
+        
+        // Check if user has generations left
+        if (generationsLeft <= 0) {
+          upgradeModal.classList.remove("hidden");
+          return;
+        }
+        
+        generationsLeft--;
+        remainingGenerations.textContent = generationsLeft;
+        
+        // Show progress
+        progress.classList.remove("hidden");
+        let progressValue = 0;
+        
+        // Simulate progress
+        const progressInterval = setInterval(() => {
+          progressValue += 5;
+          progressBar.style.width = `${progressValue}%`;
+          
+          if (progressValue === 25) {
+            progressStatus.textContent = "Analyzing prompt...";
+          } else if (progressValue === 50) {
+            progressStatus.textContent = "Generating image...";
+          } else if (progressValue === 75) {
+            progressStatus.textContent = "Applying finishing touches...";
+          }
+          
+          if (progressValue >= 100) {
+            clearInterval(progressInterval);
+            setTimeout(() => {
+              progress.classList.add("hidden");
+              addGeneratedImage(prompt, model, aspectRatio);
+            }, 500);
+          }
+        }, 100);
+      });
+
+      function addGeneratedImage(prompt, model, aspectRatio) {
+        // Get dimensions based on aspect ratio
+        let width, height;
+        switch (aspectRatio) {
+          case "1:1": width = 400; height = 400; break;
+          case "4:3": width = 400; height = 300; break;
+          case "16:9": width = 400; height = 225; break;
+          case "9:16": width = 225; height = 400; break;
+          default: width = 400; height = 400;
+        }
+        
+        // Create image placeholder (would be real AI generation in production)
+        const modelText = model === "standard" ? "" : `+${model}+`;
+        const imageUrl = `https://via.placeholder.com/${width}x${height}?text=AI+${modelText}+${encodeURIComponent(prompt.substring(0, 20))}`;
+        
+        const imgDiv = document.createElement("div");
+        imgDiv.className = "artwork";
+        imgDiv.innerHTML = `
+          <img src="${imageUrl}" alt="${prompt}" />
+          <div class="artwork-info">
+            <p class="prompt-text">${prompt.substring(0, 60)}${prompt.length > 60 ? "..." : ""}</p>
+            <div class="artwork-actions">
+              <button class="action-btn edit-btn"><i class="fas fa-edit"></i></button>
+              <button class="action-btn download-btn"><i class="fas fa-download"></i></button>
+              <button class="action-btn share-btn"><i class="fas fa-share-alt"></i></button>
+              <button class="action-btn like-btn"><i class="far fa-heart"></i></button>
+            </div>
+          </div>
+        `;
+        
+        // Add event listeners to the buttons
+        imgDiv.querySelector(".edit-btn").addEventListener("click", () => {
+          editorImg.src = imageUrl;
+          editorImg.scrollIntoView({ behavior: "smooth" });
+          
+          // Add to history
+          const historyItems = document.getElementById("history-items");
+          const historyItem = document.createElement("div");
+          historyItem.className = "history-item";
+          historyItem.textContent = "Edit 1";
+          historyItems.appendChild(historyItem);
+        });
+        
+        imgDiv.querySelector(".share-btn").addEventListener("click", () => {
+          sharePanel.classList.remove("hidden");
+          sharePanel.scrollIntoView({ behavior: "smooth" });
+        });
+        
+        imgDiv.querySelector(".download-btn").addEventListener("click", () => {
+          const link = document.createElement("a");
+          link.href = imageUrl;
+          link.download = `artify-ai-${Date.now()}.png`;
+          link.click();
+        });
+        
+        imgDiv.querySelector(".like-btn").addEventListener("click", (e) => {
+          const likeBtn = e.currentTarget;
+          likeBtn.innerHTML = likeBtn.innerHTML.includes("far") ? 
+            '<i class="fas fa-heart"></i>' : 
+            '<i class="far fa-heart"></i>';
+        });
+        
+        // Add to gallery
+        gallery.insertBefore(imgDiv, gallery.firstChild);
+      }
+
+      // Editor functionality
+      const uploadInput = document.getElementById("upload-img");
+      const grayscaleBtn = document.getElementById("grayscale");
+      const brightenBtn = document.getElementById("brighten");
+      const contrastBtn = document.getElementById("contrast");
+      const saturationBtn = document.getElementById("saturation");
+      const cropBtn = document.getElementById("crop");
+      const rotateBtn = document.getElementById("rotate");
+      const flipBtn = document.getElementById("flip");
+      const resizeBtn = document.getElementById("resize");
+      const upscaleBtn = document.getElementById("upscale");
+      const removeBgBtn = document.getElementById("remove-bg");
+      const inpaintBtn = document.getElementById("inpaint");
+      const saveBtn = document.getElementById("save-edit");
+      const shareEditBtn = document.getElementById("share-edit");
+      const resetBtn = document.getElementById("reset-edit");
+      const cropOverlay = document.getElementById("crop-overlay");
+      const styleOptions = document.querySelectorAll(".style-option");
+      
+      // Store original image for reset
+      let originalImage = "";
+      
+      uploadInput?.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          editorImg.src = URL.createObjectURL(file);
+          originalImage = editorImg.src;
+          
+          // Reset history
+          const historyItems = document.getElementById("history-items");
+          historyItems.innerHTML = '<div class="history-item">Original</div>';
+        }
+      });
+      
+      // Basic editing functions
+      grayscaleBtn?.addEventListener("click", () => {
+        editorImg.style.filter = "grayscale(100%)";
+        addHistoryItem("Grayscale");
+      });
+      
+      brightenBtn?.addEventListener("click", () => {
+        editorImg.style.filter = "brightness(130%)";
+        addHistoryItem("Brighten");
+      });
+      
+      contrastBtn?.addEventListener("click", () => {
+        editorImg.style.filter = "contrast(150%)";
+        addHistoryItem("Contrast");
+      });
+      
+      saturationBtn?.addEventListener("click", () => {
+        editorImg.style.filter = "saturate(150%)";
+        addHistoryItem("Saturation");
+      });
+      
+      // Style transfer options
+      styleOptions
+        
+        <!-- Community Gallery Preview -->
+        <div class="community-gallery-section">
+          <h2>Community Gallery <span class="badge">Trending</span></h2>
+          <div class="gallery-preview">
+            <div class="gallery-item">
+              <img src="https://via.placeholder.com/200?text=Community+Art+1" alt="Community artwork" />
+              <div class="gallery-item-info">
+                <p class="creator">@artist123</p>
+                <p class="likes"><i class="fas fa-heart"></i> 128</p>
+              </div>
+            </div>
+            <div class="gallery-item">
+              <img src="https://via.placeholder.com/200?text=Community+Art+2" alt="Community artwork" />
+              <div class="gallery-item-info">
+                <p class="creator">@creative_mind</p>
+                <p class="likes"><i class="fas fa-heart"></i> 92</p>
+              </div>
+            </div>
+            <div class="gallery-item">
+              <img src="https://via.placeholder.com/200?text=Community+Art+3" alt="Community artwork" />
+              <div class="gallery-item-info">
+                <p class="creator">@digital_dreams</p>
+                <p class="likes"><i class="fas fa-heart"></i> 215</p>
+              </div>
+            </div>
+            <div class="gallery-item">
+              <img src="https://via.placeholder.com/200?text=Community+Art+4" alt="Community artwork" />
+              <div class="gallery-item-info">
+                <p class="creator">@art_explorer</p>
+                <p class="likes"><i class="fas fa-heart"></i> 164</p>
+              </div>
+            </div>
+          </div>
+          <a href="/community-gallery" class="view-all-btn">View All Community Artwork <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </section>
+    </main>
+    <Footer />
+
+    <!-- Modal components -->
+    <div id="login-modal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Login to Artify-AI</h2>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="login-email">Email</label>
+            <input type="email" id="login-email" required />
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" required />
+          </div>
+          <button type="submit" class="primary-btn">Login</button>
+        </form>
+        <div class="auth-options">
+          <a href="#" id="forgot-password">Forgot Password?</a>
+          <p>Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
+        </div>
+      </div>
+    </div>
+
+    <div id="signup-modal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Create an Account</h2>
+        <form id="signup-form">
+          <div class="form-group">
+            <label for="signup-name">Full Name</label>
+            <input type="text" id="signup-name" required />
+          </div>
+          <div class="form-group">
+            <label for="signup-email">Email</label>
+            <input type="email" id="signup-email" required />
+          </div>
+          <div class="form-group">
+            <label for="signup-password">Password</label>
+            <input type="password" id="signup-password" required />
+          </div>
+          <div class="form-group">
+            <label for="signup-confirm">Confirm Password</label>
+            <input type="password" id="signup-confirm" required />
+          </div>
+          <div class="terms-checkbox">
+            <input type="checkbox" id="terms-agree" required />
+            <label for="terms-agree">I agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a></label>
+          </div>
+          <button type="submit" class="primary-btn">Create Account</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="upgrade-modal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Upgrade to Premium</h2>
+        <div class="pricing-plans">
+          <div class="plan">
+            <h3>Monthly</h3>
+            <p class="price">$9.99<span>/month</span></p>
+            <ul class="features-list">
+              <li>Unlimited generations</li>
+              <li>All premium editing tools</li>
+              <li>Advanced AI models</li>
+              <li>No watermarks</li>
+              <li>Priority generation</li>
+            </ul>
+            <button class="primary-btn select-plan" data-plan="monthly">Select</button>
+          </div>
+          <div class="plan recommended">
+            <div class="badge">Best Value</div>
+            <h3>Annual</h3>
+            <p class="price">$99.99<span>/year</span></p>
+            <p class="savings">Save 17%</p>
+            <ul class="features-list">
+              <li>All monthly features</li>
+              <li>Early access to new features</li>
+              <li>Commercial usage rights</li>
+            </ul>
+            <button class="primary-btn select-plan" data-plan="annual">Select</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+        <!-- Advanced Editor Section -->
+        <div class="editor-section">
+          <h2>Advanced Editor <span class="badge">New</span></h2>
+          <div class="editor-content">
+            <div class="editor-workspace">
+              <div class="editor-canvas-container">
+                <img id="editor-img" src="https://via.placeholder.com/500x500?text=Select+or+Generate+Image" alt="Image to edit" />
+                <div id="crop-overlay" class="hidden"></div>
+              </div>
+              <div class="editor-history">
+                <h4>History</h4>
+                <div id="history-items">
+                  <div class="history-item">Original</div>
+                </div>
+                <button id="reset-edit" class="secondary-btn"><i class="fas fa-undo"></i> Reset</button>
+              </div>
+            </div>
+            
+            <div class="editor-toolbox">
+              <div class="toolbox-section">
+                <h4>Upload Image</h4>
+                <input type="file" id="upload-img" accept="image/*" />
+                <label for="upload-img" class="file-upload-btn"><i class="fas fa-upload"></i> Select File</label>
+              </div>
+              
+              <div class="toolbox-section">
+                <h4>Adjustments</h4>
+                <div class="tool-controls">
+                  <button id="grayscale" class="tool-btn"><i class="fas fa-adjust"></i> Grayscale</button>
+                  <button id="brighten" class="tool-btn"><i class="fas fa-sun"></i> Brighten</button>
+                  <button id="contrast" class="tool-btn"><i class="fas fa-sliders-h"></i> Contrast</button>
+                  <button id="saturation" class="tool-btn"><i class="fas fa-palette"></i> Saturation</button>
+                </div>
+              </div>
+              
+              <div class="toolbox-section">
+                <h4>Style Transfer</h4>
+                <div class="style-options">
+                  <div class="style-option" data-style="oil-painting">
+                    <img src="https://via.placeholder.com/60?text=Oil" alt="Oil Painting" />
+                    <span>Oil Painting</span>
+                  </div>
+                  <div class="style-option" data-style="watercolor">
+                    <img src="https://via.placeholder.com/60?text=Water" alt="Watercolor" />
+                    <span>Watercolor</span>
+                  </div>
+                  <div class="style-option" data-style="sketch">
+                    <img src="https://via.placeholder.com/60?text=Sketch" alt="Sketch" />
+                    <span>Sketch</span>
+                  </div>
+                  <div class="style-option premium" data-style="pixel-art">
+                    <img src="https://via.placeholder.com/60?text=Pixel" alt="Pixel Art" />
+                    <span>Pixel Art</span>
+                    <i class="fas fa-crown premium-icon"></i>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="toolbox-section">
+                <h4>Transform</h4>
+                <div class="tool-controls">
+                  <button id="crop" class="tool-btn"><i class="fas fa-crop-alt"></i> Crop</button>
+                  <button id="rotate" class="tool-btn"><i class="fas fa-redo"></i> Rotate</button>
+                  <button id="flip" class="tool-btn"><i class="fas fa-exchange-alt"></i> Flip</button>
+                  <button id="resize" class="tool-btn premium"><i class="fas fa-expand"></i> Resize <i class="fas fa-crown premium-icon"></i></button>
+                </div>
+              </div>
+              
+              <div class="toolbox-section">
+                <h4>AI Enhancement <i class="fas fa-crown premium-icon"></i></h4>
+                <div class="ai-enhancement premium">
+                  <button id="upscale" class="tool-btn premium"><i class="fas fa-expand-arrows-alt"></i> Upscale Resolution</button>
+                  <button id="remove-bg" class="tool-btn premium"><i class="fas fa-cut"></i> Remove Background</button>
+                  <button id="inpaint" class="tool-btn premium"><i class="fas fa-brush"></i> Smart Inpainting</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="editor-actions">
+            <button id="save-edit" class="primary-btn"><i class="fas fa-download"></i> Save Image</button>
+            <button id="share-edit" class="secondary-btn"><i class="fas fa-share-alt"></i> Share</button>
+          </div>
+        </div>
+        </div>
+        
+        <!-- Subscription Banner -->
+        <div class="subscription-banner">
+          <p><i class="fas fa-crown"></i> Upgrade to Premium for unlimited generations and advanced editing tools</p>
+          <button id="upgrade-btn">Upgrade Now</button>
+        </div>
+        
+        <!-- Generator Section with Enhanced UI -->
+        <div class="generator-section">
+          <h2>Generate <span class="badge">AI Powered</span></h2>
+          <div class="generation-options">
+            <div class="option-group">
+              <label for="generation-model">AI Model:</label>
+              <select id="generation-model">
+                <option value="standard">Standard</option>
+                <option value="enhanced">Enhanced (Premium)</option>
+                <option value="realistic">Realistic (Premium)</option>
+                <option value="artistic">Artistic (Premium)</option>
+              </select>
+            </div>
+            <div class="option-group">
+              <label for="aspect-ratio">Aspect Ratio:</label>
+              <select id="aspect-ratio">
+                <option value="1:1">Square (1:1)</option>
+                <option value="4:3">Standard (4:3)</option>
+                <option value="16:9">Widescreen (16:9)</option>
+                <option value="9:16">Portrait (9:16)</option>
+              </select>
+            </div>
+          </div>
+          
+          <form id="generator-form">
+            <div class="prompt-container">
+              <textarea id="prompt-input" placeholder="Describe your artwork in detail (e.g., A futuristic city at sunset with flying cars and neon lights)" required></textarea>
+              <div class="prompt-suggestions">
+                <p>Try: <span class="suggestion">vibrant sunset over mountains</span> <span class="suggestion">cyberpunk cityscape</span> <span class="suggestion">underwater fantasy world</span></p>
+              </div>
+            </div>
+            <div class="negative-prompt">
+              <details>
+                <summary>Negative Prompt (Optional)</summary>
+                <textarea id="negative-prompt" placeholder="Elements you want to exclude (e.g., blur, distortion, low quality)"></textarea>
+              </details>
+            </div>
+            <div class="generation-controls">
+              <button type="submit" id="generate-btn"><i class="fas fa-wand-magic-sparkles"></i> Generate</button>
+              <div class="generation-count">
+                <span id="remaining-generations">10</span> generations remaining
+              </div>
+            </div>
+          </form>
+          
+          <!-- Loading Indicator and Progress -->
+          <div id="generation-progress" class="hidden">
+            <div class="progress-container">
+              <div class="progress-bar"></div>
+            </div>
+            <p class="progress-status">Generating your artwork...</p>
+          </div>
+          
+          <!-- Generated Images Gallery with Enhanced Display -->
+          <div id="generated-images" class="artwork-grid">
+            <!-- Images will be added here by JavaScript -->
+          </div>
+          
+          <!-- Community and Sharing -->
+          <div class="community-share hidden" id="share-panel">
+            <h3>Share your creation</h3>
+            <div class="share-buttons">
+              <button class="share-btn facebook"><i class="fab fa-facebook-f"></i></button>
+              <button class="share-btn twitter"><i class="fab fa-twitter"></i></button>
+              <button class="share-btn pinterest"><i class="fab fa-pinterest-p"></i></button>
+              <button class="share-btn instagram"><i class="fab fa-instagram"></i></button>
+            </div>
+            <div class="community-submit">
+              <button id="submit-to-gallery"><i class="fas fa-cloud-upload-alt"></i> Submit to Community Gallery</button>
+            </div>
+          </div>
+        </div>

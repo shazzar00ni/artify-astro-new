@@ -1,0 +1,157 @@
+---
+// Hero.astro component
+interface Props {
+  title: string;
+  subtitle: string;
+}
+
+const { title, subtitle } = Astro.props;
+---
+
+<section id="hero" class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <h1>{title}</h1>
+      <p>{subtitle}</p>
+      <div class="cta-buttons">
+        <a href="#features" class="btn btn-primary">Explore Features</a>
+        <a href="#community" class="btn btn-secondary">Join Community</a>
+      </div>
+    </div>
+    <div class="hero-image">
+      <img 
+        src="/images/hero-image.svg" 
+        alt="AI-powered creativity" 
+        width="500" 
+        height="400"
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding: 5rem 0;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+    transition: background 0.3s ease;
+  }
+
+  :global(body.dark-mode) .hero {
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .hero-content {
+    flex: 1;
+    max-width: 600px;
+  }
+
+  h1 {
+    font-size: 3rem;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+  }
+
+  p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    color: var(--text-light);
+    line-height: 1.6;
+  }
+
+  :global(body.dark-mode) p {
+    color: var(--text-dark);
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary {
+    background-color: #6366f1;
+    color: white;
+    box-shadow: 0 4px 6px rgba(99, 102, 241, 0.25);
+  }
+
+  .btn-primary:hover {
+    background-color: #4f46e5;
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background-color: transparent;
+    color: #6366f1;
+    border: 2px solid #6366f1;
+  }
+
+  .btn-secondary:hover {
+    background-color: rgba(99, 102, 241, 0.1);
+    transform: translateY(-2px);
+  }
+
+  :global(body.dark-mode) .btn-secondary {
+    color: #818cf8;
+    border-color: #818cf8;
+  }
+
+  .hero-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .hero-image img {
+    max-width: 100%;
+    height: auto;
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+    transition: filter 0.3s ease;
+  }
+
+  :global(body.dark-mode) .hero-image img {
+    filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.4)) brightness(0.9);
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+    }
+
+    .cta-buttons {
+      justify-content: center;
+    }
+
+    .hero-image {
+      margin-top: 2rem;
+    }
+  }
+</style>

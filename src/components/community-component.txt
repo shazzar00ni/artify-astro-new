@@ -1,0 +1,297 @@
+---
+// Community.astro component
+
+const testimonials = [
+  {
+    name: "Sarah Johnson",
+    role: "Digital Artist",
+    content: "Artify-AI has completely transformed my creative workflow. The AI image generation tools save me hours of work while giving me new inspiration.",
+    avatar: "/images/avatar-1.jpg",
+  },
+  {
+    name: "Michael Chen",
+    role: "Game Developer",
+    content: "I use Artify-AI for concept art generation. It's incredible how quickly I can iterate through different visual ideas for my games.",
+    avatar: "/images/avatar-2.jpg",
+  },
+  {
+    name: "Emma Rodriguez",
+    role: "UI/UX Designer",
+    content: "The style transfer feature helps me experiment with different visual aesthetics for my client projects. It's an essential part of my design process now.",
+    avatar: "/images/avatar-3.jpg",
+  },
+];
+---
+
+<section id="community" class="community">
+  <div class="container">
+    <div class="section-header">
+      <h2>Our Community</h2>
+      <p>Join thousands of creative professionals already using Artify-AI</p>
+    </div>
+
+    <div class="testimonials">
+      {testimonials.map((testimonial) => (
+        <div class="testimonial-card">
+          <div class="testimonial-content">
+            <svg class="quote-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"></path>
+              <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"></path>
+            </svg>
+            <p>{testimonial.content}</p>
+          </div>
+          <div class="testimonial-author">
+            <img 
+              src={testimonial.avatar} 
+              alt={testimonial.name} 
+              width="50" 
+              height="50"
+            />
+            <div class="author-info">
+              <h4>{testimonial.name}</h4>
+              <p>{testimonial.role}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="community-stats">
+      <div class="stat">
+        <span class="stat-value">10,000+</span>
+        <span class="stat-label">Active Users</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">1M+</span>
+        <span class="stat-label">Images Generated</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">4.9/5</span>
+        <span class="stat-label">User Rating</span>
+      </div>
+    </div>
+
+    <div class="community-cta">
+      <h3>Ready to join our creative community?</h3>
+      <a href="#" class="btn btn-primary">Sign Up for Free</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .community {
+    padding: 5rem 0;
+    background-color: #f9fafb;
+    transition: background-color 0.3s ease;
+  }
+
+  :global(body.dark-mode) .community {
+    background-color: #1a202c;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-light);
+    position: relative;
+    display: inline-block;
+  }
+
+  h2::after {
+    content: "";
+    position: absolute;
+    bottom: -0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    border-radius: 2px;
+  }
+
+  :global(body.dark-mode) h2 {
+    color: var(--text-dark);
+  }
+
+  .section-header p {
+    font-size: 1.25rem;
+    color: var(--text-light);
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  :global(body.dark-mode) .section-header p {
+    color: var(--text-dark);
+  }
+
+  .testimonials {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+  }
+
+  .testimonial-card {
+    background-color: white;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  :global(body.dark-mode) .testimonial-card {
+    background-color: #2d3748;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  }
+
+  .testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 20px -3px rgba(0, 0, 0, 0.15);
+  }
+
+  :global(body.dark-mode) .testimonial-card:hover {
+    box-shadow: 0 15px 20px -3px rgba(0, 0, 0, 0.4);
+  }
+
+  .quote-icon {
+    color: #6366f1;
+    opacity: 0.3;
+    margin-bottom: 1rem;
+  }
+
+  .testimonial-content {
+    flex: 1;
+  }
+
+  .testimonial-content p {
+    color: #718096;
+    line-height: 1.6;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  :global(body.dark-mode) .testimonial-content p {
+    color: #cbd5e0;
+  }
+
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+  }
+
+  .testimonial-author img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 1rem;
+  }
+
+  .author-info h4 {
+    font-size: 1rem;
+    margin: 0;
+    color: var(--text-light);
+  }
+
+  :global(body.dark-mode) .author-info h4 {
+    color: var(--text-dark);
+  }
+
+  .author-info p {
+    font-size: 0.875rem;
+    color: #718096;
+    margin: 0;
+  }
+
+  :global(body.dark-mode) .author-info p {
+    color: #a0aec0;
+  }
+
+  .community-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 4rem;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-value {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #6366f1;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-label {
+    font-size: 1rem;
+    color: var(--text-light);
+  }
+
+  :global(body.dark-mode) .stat-label {
+    color: var(--text-dark);
+  }
+
+  .community-cta {
+    text-align: center;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    padding: 3rem 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.5);
+  }
+
+  .community-cta h3 {
+    font-size: 1.5rem;
+    color: white;
+    margin-bottom: 1.5rem;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary {
+    background-color: white;
+    color: #6366f1;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-primary:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  @media (max-width: 768px) {
+    .testimonials {
+      grid-template-columns: 1fr;
+    }
+
+    .community-stats {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+</style>
