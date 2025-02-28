@@ -1,0 +1,348 @@
+---
+import "../styles/global.css";
+import Header from "../components/header.astro";
+import Footer from "../components/footer.astro";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Artify-AI: Generator & Editor</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <section id="generator" class="generator">
+        <h1>Generate & Edit AI Artwork</h1>
+        <p>Create and customize unique art with advanced AI technology.</p>
+        
+        <!-- User Account Status -->
+        <div class="user-status">
+          <button id="login-btn" class="auth-btn"><i class="fas fa-user"></i> Login</button>
+          <button id="signup-btn" class="auth-btn"><i class="fas fa-user-plus"></i> Sign Up</button>
+          <div id="user-profile" class="hidden">
+            <img src="https://via.placeholder.com/40" alt="Profile" class="profile-img" />
+            <span id="username">User</span>
+          </div>
+        </div>
+
+        <!-- Community Gallery Preview -->
+        <div class="community-gallery-section">
+          <h2>Community Gallery <span class="badge">Trending</span></h2>
+          <div class="gallery-preview">
+            <div class="gallery-item">
+              <img src="https://via.placeholder.com/200?text=Community+Art+1" alt="Community artwork" />
+              <div class="gallery-item-info">
+                <p class="creator">@artist123</p>
+                <p class="likes"><i class="fas fa-heart"></i> 128</p>
+              </div>
+            </div>
+            <div class="gallery-item">
+              <img src="https://via.placeholder.com/200?text=Community+Art+2" alt="Community artwork" />
+              <div class="gallery-item-info">
+                <p class="creator">@creative_mind</p>
+                <p class="likes"><i class="fas fa-heart"></i> 92</p>
+              </div>
+            </div>
+            <div class="gallery-item">
+              <img src="https://via.placeholder.com/200?text=Community+Art+3" alt="Community artwork" />
+              <div class="gallery-item-info">
+                <p class="creator">@digital_dreams</p>
+                <p class="likes"><i class="fas fa-heart"></i> 215</p>
+              </div>
+            </div>
+            <div class="gallery-item">
+              <img src="https://via.placeholder.com/200?text=Community+Art+4" alt="Community artwork" />
+              <div class="gallery-item-info">
+                <p class="creator">@art_explorer</p>
+                <p class="likes"><i class="fas fa-heart"></i> 164</p>
+              </div>
+            </div>
+          </div>
+          <a href="/community-gallery" class="view-all-btn">View All Community Artwork <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </section>
+    </main>
+    <Footer />
+
+    <script>
+      // Theme Toggle
+      const toggle = document.getElementById("theme-toggle");
+      toggle?.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+        localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+      });
+      
+      if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark-mode");
+
+      // Modal Functionality
+      const loginBtn = document.getElementById("login-btn");
+      const signupBtn = document.getElementById("signup-btn");
+      const upgradeBtn = document.getElementById("upgrade-btn");
+      const loginModal = document.getElementById("login-modal");
+      const signupModal = document.getElementById("signup-modal");
+      const upgradeModal = document.getElementById("upgrade-modal");
+      const closeButtons = document.querySelectorAll(".close-modal");
+      const showSignupLink = document.getElementById("show-signup");
+
+      loginBtn?.addEventListener("click", () => {
+        loginModal.classList.remove("hidden");
+      });
+
+      signupBtn?.addEventListener("click", () => {
+        signupModal.classList.remove("hidden");
+      });
+
+      upgradeBtn?.addEventListener("click", () => {
+        upgradeModal.classList.remove("hidden");
+      });
+
+      showSignupLink?.addEventListener("click", (e) => {
+        e.preventDefault();
+        loginModal.classList.add("hidden");
+        signupModal.classList.remove("hidden");
+      });
+
+      closeButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          loginModal.classList.add("hidden");
+          signupModal.classList.add("hidden");
+          upgradeModal.classList.add("hidden");
+        });
+      });
+
+      window.addEventListener("click", (e) => {
+        if (e.target === loginModal || e.target === signupModal || e.target === upgradeModal) {
+          loginModal.classList.add("hidden");
+          signupModal.classList.add("hidden");
+          upgradeModal.classList.add("hidden");
+        }
+      });
+
+      // Enhanced Generator Logic
+      const form = document.getElementById("generator-form");
+      const gallery = document.getElementById("generated-images");
+      const progress = document.getElementById("generation-progress");
+      const progressBar = progress?.querySelector(".progress-bar");
+      const progressStatus = progress?.querySelector(".progress-status");
+      const sharePanel = document.getElementById("share-panel");
+      const editorImg = document.getElementById("editor-img");
+      const promptInput = document.getElementById("prompt-input");
+      const promptSuggestions = document.querySelectorAll(".suggestion");
+      const remainingGenerations = document.getElementById("remaining-generations");
+
+      // Set initial count
+      let generationsLeft = 10;
+      remainingGenerations.textContent = generationsLeft;
+
+      // Prompt suggestions
+      promptSuggestions.forEach(suggestion => {
+        suggestion.addEventListener("click", () => {
+          promptInput.value = suggestion.textContent;
+        });
+      });
+
+      form?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const prompt = promptInput.value;
+        const modelElement = document.getElementById("generation-model");
+        const model = modelElement ? modelElement.value : "";
+        const aspectRatioElement = document.getElementById("aspect-ratio");
+        const aspectRatio = aspectRatioElement ? aspectRatioElement.value : "";
+        
+        // Check if user has generations left
+        if (generationsLeft <= 0) {
+          upgradeModal.classList.remove("hidden");
+          return;
+        }
+        
+        generationsLeft--;
+        remainingGenerations.textContent = generationsLeft;
+        
+        // Show progress
+        progress.classList.remove("hidden");
+        let progressValue = 0;
+        
+        // Simulate progress
+        const progressInterval = setInterval(() => {
+          progressValue += 5;
+          progressBar.style.width = `${progressValue}%`;
+          
+          if (progressValue === 25) {
+            progressStatus.textContent = "Analyzing prompt...";
+          } else if (progressValue === 50) {
+            progressStatus.textContent = "Generating image...";
+          } else if (progressValue === 75) {
+            progressStatus.textContent = "Applying finishing touches...";
+          }
+          
+          if (progressValue >= 100) {
+            clearInterval(progressInterval);
+            setTimeout(() => {
+              progress.classList.add("hidden");
+              addGeneratedImage(prompt, model, aspectRatio);
+            }, 500);
+          }
+        }, 100);
+      });
+
+      function addGeneratedImage(prompt, model, aspectRatio) {
+        // Get dimensions based on aspect ratio
+        let width, height;
+        switch (aspectRatio) {
+          case "1:1": width = 400; height = 400; break;
+          case "4:3": width = 400; height = 300; break;
+          case "16:9": width = 400; height = 225; break;
+          case "9:16": width = 225; height = 400; break;
+          default: width = 400; height = 400;
+        }
+        
+        // Create image placeholder (would be real AI generation in production)
+        const modelText = model === "standard" ? "" : `+${model}+`;
+        const imageUrl = `https://via.placeholder.com/${width}x${height}?text=AI+${modelText}+${encodeURIComponent(prompt.substring(0, 20))}`;
+        
+        const imgDiv = document.createElement("div");
+        imgDiv.className = "artwork";
+        imgDiv.innerHTML = `
+          <img src="${imageUrl}" alt="${prompt}" />
+          <div class="artwork-info">
+            <p class="prompt-text">${prompt.substring(0, 60)}${prompt.length > 60 ? "..." : ""}</p>
+            <div class="artwork-actions">
+              <button class="action-btn edit-btn"><i class="fas fa-edit"></i></button>
+              <button class="action-btn download-btn"><i class="fas fa-download"></i></button>
+              <button class="action-btn share-btn"><i class="fas fa-share-alt"></i></button>
+              <button class="action-btn like-btn"><i class="far fa-heart"></i></button>
+            </div>
+          </div>
+        `;
+        
+        const editBtn = imgDiv.querySelector(".edit-btn");
+        if (editBtn) {
+          editBtn.addEventListener("click", () => {
+            editorImg.src = imageUrl;
+            editorImg.scrollIntoView({ behavior: "smooth" });
+            
+            // Add to history
+            const historyItems = document.getElementById("history-items");
+            const historyItem = document.createElement("div");
+            historyItem.className = "history-item";
+            historyItem.textContent = "Edit 1";
+            if (historyItems) {
+              historyItems.appendChild(historyItem);
+            }
+          });
+        }
+        
+        const shareBtn = imgDiv.querySelector(".share-btn");
+        if (shareBtn) {
+          shareBtn.addEventListener("click", () => {
+            sharePanel.classList.remove("hidden");
+            sharePanel.scrollIntoView({ behavior: "smooth" });
+          });
+        }
+        
+        const downloadBtn = imgDiv.querySelector(".download-btn");
+        if (downloadBtn) {
+          downloadBtn.addEventListener("click", () => {
+            const link = document.createElement("a");
+            link.href = imageUrl;
+            link.download = `artify-ai-${Date.now()}.png`;
+            link.click();
+          });
+        }
+        
+        const likeBtn = imgDiv.querySelector(".like-btn");
+        if (likeBtn) {
+          likeBtn.addEventListener("click", (e) => {
+            const btn = e.currentTarget;
+            btn.innerHTML = btn.innerHTML.includes("far") ? 
+              '<i class="fas fa-heart"></i>' : 
+              '<i class="far fa-heart"></i>';
+          });
+        }
+        
+        // Add to gallery
+        gallery.insertBefore(imgDiv, gallery.firstChild);
+      }
+
+      // Editor functionality
+      const uploadInput = document.getElementById("upload-img");
+      const grayscaleBtn = document.getElementById("grayscale");
+      const brightenBtn = document.getElementById("brighten");
+      const contrastBtn = document.getElementById("contrast");
+      const saturationBtn = document.getElementById("saturation");
+      const cropBtn = document.getElementById("crop");
+      const rotateBtn = document.getElementById("rotate");
+      const flipBtn = document.getElementById("flip");
+      const resizeBtn = document.getElementById("resize");
+      const upscaleBtn = document.getElementById("upscale");
+      const removeBgBtn = document.getElementById("remove-bg");
+      const inpaintBtn = document.getElementById("inpaint");
+      const saveBtn = document.getElementById("save-edit");
+      const shareEditBtn = document.getElementById("share-edit");
+      const resetBtn = document.getElementById("reset-edit");
+      const cropOverlay = document.getElementById("crop-overlay");
+      const styleOptions = document.querySelectorAll(".style-option");
+      
+      // Store original image for reset
+      let originalImage = "";
+      
+      uploadInput?.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          editorImg.src = URL.createObjectURL(file);
+          originalImage = editorImg.src;
+          
+          // Reset history
+          const historyItems = document.getElementById("history-items");
+          if (historyItems) {
+            historyItems.innerHTML = '<div class="history-item">Original</div>';
+          }
+        }
+      });
+      
+      // Basic editing functions
+      grayscaleBtn?.addEventListener("click", () => {
+        editorImg.style.filter = "grayscale(100%)";
+        addHistoryItem("Grayscale");
+      });
+      
+      brightenBtn?.addEventListener("click", () => {
+        editorImg.style.filter = "brightness(130%)";
+        addHistoryItem("Brighten");
+      });
+      
+      contrastBtn?.addEventListener("click", () => {
+        editorImg.style.filter = "contrast(150%)";
+        addHistoryItem("Contrast");
+      });
+      
+      saturationBtn?.addEventListener("click", () => {
+        editorImg.style.filter = "saturate(150%)";
+        addHistoryItem("Saturation");
+      });
+      
+      // Style transfer options
+      styleOptions.forEach(option => {
+        option.addEventListener("click", () => {
+          const style = option.getAttribute("data-style");
+          editorImg.src = `https://via.placeholder.com/500x500?text=${style}`;
+          addHistoryItem(style.charAt(0).toUpperCase() + style.slice(1));
+        });
+      });
+
+      function addHistoryItem(action) {
+        const historyItems = document.getElementById("history-items");
+        const historyItem = document.createElement("div");
+        historyItem.className = "history-item";
+        historyItem.textContent = action;
+        if (historyItems) {
+          historyItems.appendChild(historyItem);
+        }
+      }
+    </script>
+  </body>
+</html>
